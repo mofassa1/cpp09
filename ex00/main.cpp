@@ -45,56 +45,63 @@ int main(int ac, char **av){
         std::cout << "invalid  arguiments count " << std::endl;
         return 1;
     }
-    BitcoinExchange dataBase;
-    dataBase.fillDataBase();
-    std::ifstream inputFile(av[1]);
-
-
-    if (!inputFile.is_open())
+    try
     {
-        std::cerr << "Failed to open File." << std::endl;
-        return 1;
-    }
+        
+        BitcoinExchange dataBase;
+        dataBase.fillDataBase();
+        std::ifstream inputFile(av[1]);
 
-    std::string line;
-    std::getline(inputFile, line);
-    if ("date | value" != line){
-        std::cerr << "invalid start line of the file !!!" << std::endl;
-    }
 
-    while (std::getline(inputFile, line)) {
-        std::vector<std::string> splited = splitBySpace(line);
-
-        if (splited.size() != 3){
-            std::cout << "Error: bad input  => " << line << std::endl;
-            continue ;
-        }
-        if (splited[1] != "|"){
-            std::cerr << "syntax error !!!" << std::endl;
-            continue ;
-        }
-        if (!isValidDate(splited[0]))
+        if (!inputFile.is_open())
         {
-            std::cerr << "Invalid date format !!!" << std::endl;
-            continue ;
-        }
-        float rate = std::atof(splited[2].c_str());
-
-        if (rate < 0){
-            std::cerr << "Error: not a positive number." << std::endl;
-            continue ;
+            std::cerr << "Failed to open File." << std::endl;
+            return 1;
         }
 
-        if (rate > 1000){
-            std::cerr << "Error: too large a number." << std::endl;
-            continue ;
+        std::string line;
+        std::getline(inputFile, line);
+        if ("date | value" != line){
+            std::cerr << "invalid start line of the file !!!" << std::endl;
+            return 1;
         }
 
-        dataBase.findElement(splited[0], rate);
+        while (std::getline(inputFile, line)) {
+            std::vector<std::string> splited = splitBySpace(line);
+
+            if (splited.size() != 3){
+                std::cout << "Error: bad input  => " << line << std::endl;
+                continue ;
+            }
+            if (splited[1] != "|"){
+                std::cerr << "syntax error !!!" << std::endl;
+                continue ;
+            }
+            if (!isValidDate(splited[0]))
+            {
+                std::cerr << "Invalid date format !!!" << std::endl;
+                continue ;
+            }
+            float rate = std::atof(splited[2].c_str());
+
+            if (rate < 0){
+                std::cerr << "Error: not a positive number." << std::endl;
+                continue ;
+            }
+
+            if (rate > 1000){
+                std::cerr << "Error: too large a number." << std::endl;
+                continue ;
+            }
+
+            dataBase.findElement(splited[0], rate);
+        }
+
+        inputFile.close();
     }
-
-    inputFile.close();
-
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
     return 0;
-
 }

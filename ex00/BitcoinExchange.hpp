@@ -14,14 +14,28 @@ class BitcoinExchange
         std::map<std::string, float> dataBase;
     
     public:
-        BitcoinExchange(/* args */);
+        BitcoinExchange();
+        BitcoinExchange(const BitcoinExchange& other);
+        BitcoinExchange& operator=(const BitcoinExchange& other);
         ~BitcoinExchange();
-        void    fillDataBase();
-        void    findElement(std::string input, float rate);
+
+        void fillDataBase();
+        void findElement(std::string input, float rate);
 };
 
 BitcoinExchange::BitcoinExchange(/* args */)
 {
+}
+
+BitcoinExchange::BitcoinExchange(const BitcoinExchange& other) {
+    this->dataBase = other.dataBase;
+}
+
+BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other) {
+    if (this != &other) {
+        this->dataBase = other.dataBase;
+    }
+    return *this;
 }
 
 BitcoinExchange::~BitcoinExchange()
