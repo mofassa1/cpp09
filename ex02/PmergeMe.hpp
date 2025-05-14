@@ -1,22 +1,29 @@
 #pragma once
+
 #include <bits/stdc++.h>
-// #include <vector>
+
 class PmergeMe
 {
     private:
         std::vector< std::pair<int, int> > vacPaired;
         std::deque<std::pair<int, int> > decPaired;  
-
-        void merge(std::vector<std::pair<int, int> >& arr, int start, int mid, int end);
-        void mergeSort(std::vector<std::pair<int, int> >& arr, int left, int right);
+        template <typename T>
+        void merge(T& arr, int start, int mid, int end);
+        template <typename T>
+        void mergeSort(T& arr, int left, int right);
         
+        std::deque<int> sortedElementsdeq;
+        std::vector<int> sortedElementsvec;
+
         int Inputsize;
+
     public:
         PmergeMe(/* args */);
         PmergeMe(int ac, char **str);
         void sortUsingVector();
-        // void sortUsingDeque();
+        void sortUsingDeque();
         ~PmergeMe();
+        void printContainer(int a);
 };
 
 int Jacobsthal(int n)
@@ -28,26 +35,79 @@ int Jacobsthal(int n)
     return Jacobsthal(n - 1) + 2 * Jacobsthal(n - 2);
 }
 
-void printVec(std::vector<int>& vec, std::string message)
+void PmergeMe::printContainer(int a)
 {
 
-    std::cout << message << std::endl;
-
-    for (size_t i = 0; i < vec.size(); i++)
+    if (a == 1)
     {
-        std::cout << vec[i] << " ";
+        for(size_t i = 0; i < this->sortedElementsvec.size(); i++)
+        {
+            std::cout << sortedElementsvec[i] << " " ;
+        }
+        std::cout << std::endl;
     }
-
-    std::cout << std::endl;
-    
+    else if (a == 0)
+    {
+        for(size_t i = 0; i < this->sortedElementsdeq.size(); i++)
+        {
+            std::cout << sortedElementsdeq[i] << " " ;
+        }
+        std::cout << std::endl;
+    }
 }
 ////////////////////////////////////////////////
 
-// void PmergeMe::sortUsingDeque(){
+void PmergeMe::sortUsingDeque(){
 
-//     mergeSort(decPaired, 0, decPaired.size() - 1);
+    mergeSort(decPaired, 0, decPaired.size() - 1);
 
-// }
+
+    std::deque<int> sortedElements;
+    std::deque<int> InsortedElements;
+
+    for (size_t i = 0; i < vacPaired.size(); i++)
+    {
+        sortedElements.push_back(vacPaired[i].first);
+        InsortedElements.push_back(vacPaired[i].second);
+    }
+
+    size_t inserted = 0;
+
+    size_t last = 1;
+    for (size_t i = 2; inserted < InsortedElements.size() ; i++)
+    {
+        size_t jacob = Jacobsthal(i);
+        if (jacob > 0 && jacob - 1 < InsortedElements.size())
+        {
+            if (InsortedElements[jacob - 1] != -1)
+            {
+                std::deque<int>::iterator it = std::lower_bound(sortedElements.begin(), sortedElements.end(), InsortedElements[jacob - 1]);
+                sortedElements.insert(it, InsortedElements[jacob - 1]);
+                // std::cout << "inserting the index jacob : " << jacob - 1 << std::endl;
+            }
+            inserted++;
+        }
+
+        for (size_t j = jacob - 1; j > last && inserted < InsortedElements.size() ; j--)
+        {
+            if (j - 1 < InsortedElements.size() )
+            {
+                if (InsortedElements[j - 1] != -1)
+                {
+                    std::deque<int>::iterator it = std::lower_bound(sortedElements.begin(), sortedElements.end(), InsortedElements[j - 1]);
+                    sortedElements.insert(it, InsortedElements[j - 1]);
+                    // std::cout << "inserting the index j : " << j - 1 << std::endl;
+                }
+                inserted++;
+            }
+        }
+
+        last = jacob ;
+    }
+
+    sortedElementsdeq = sortedElements;
+    // printContainer(sortedElements, "\nthe result using  deque");
+}
 
 ////////////////////////////////////////////////
 
@@ -65,9 +125,6 @@ void PmergeMe::sortUsingVector()
         InsortedElements.push_back(vacPaired[i].second);
     }
 
-    printVec(sortedElements, "sorted elements :");
-    printVec(InsortedElements, "INSorted elements :");
-
     size_t inserted = 0;
 
     size_t last = 1;
@@ -80,7 +137,7 @@ void PmergeMe::sortUsingVector()
             {
                 std::vector<int>::iterator it = std::lower_bound(sortedElements.begin(), sortedElements.end(), InsortedElements[jacob - 1]);
                 sortedElements.insert(it, InsortedElements[jacob - 1]);
-                std::cout << "inserting the index jacob : " << jacob - 1 << std::endl;
+
             }
             inserted++;
         }
@@ -93,7 +150,6 @@ void PmergeMe::sortUsingVector()
                 {
                     std::vector<int>::iterator it = std::lower_bound(sortedElements.begin(), sortedElements.end(), InsortedElements[j - 1]);
                     sortedElements.insert(it, InsortedElements[j - 1]);
-                    std::cout << "inserting the index j : " << j - 1 << std::endl;
                 }
                 inserted++;
             }
@@ -102,12 +158,8 @@ void PmergeMe::sortUsingVector()
         last = jacob ;
     }
 
-    printVec(sortedElements, "\nthe result");
-    if ((int)sortedElements.size() != Inputsize)
-        std::cout << "Not sorted !!" << std::endl;
-    else
-        std::cout << "Soooooooorted !!" << std::endl;
-
+    sortedElementsvec = sortedElements;
+    // printContainer(sortedElements, "\nthe result using vector");
 
 }
 
@@ -139,15 +191,15 @@ PmergeMe::~PmergeMe()
 {
 }
 
-
-void PmergeMe::merge(std::vector<std::pair<int, int> >& arr, int start, int mid, int end) {
+template <typename T>
+void PmergeMe::merge(T& arr, int start, int mid, int end) {
     int leftSize = mid - start + 1;
     int rightSize = end - mid;
 
 
 
-    std::vector<std::pair<int, int> > leftHalf(leftSize);
-    std::vector<std::pair<int, int> > rightHalf(rightSize);
+    T leftHalf(leftSize);
+    T rightHalf(rightSize);
 
 
     for (int i = 0; i < leftSize; i++) {
@@ -190,7 +242,9 @@ void PmergeMe::merge(std::vector<std::pair<int, int> >& arr, int start, int mid,
     }
 }
 
-void PmergeMe::mergeSort(std::vector<std::pair<int, int>>& arr, int left, int right)
+
+template <typename T> 
+void PmergeMe::mergeSort(T& arr, int left, int right)
 {
     if (left >= right)
         return;
