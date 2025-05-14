@@ -32,8 +32,6 @@ int main(int ac , char **av){
         double timeVec = 1000000.0 * (endVec - startVec) / CLOCKS_PER_SEC;
 
 
-
-
         std::cout << "Using deque:\n";
         std::clock_t startDeque = std::clock();
         Perge.sortUsingDeque();
@@ -47,7 +45,6 @@ int main(int ac , char **av){
         std::cout << "Time to process a range of " << ac -1 << " elements with std::vector :" << timeVec << " us" << std::endl;
         std::cout << "Time to process a range of " << ac -1 << " elements with std::deque :" << timeDeque << " us" << std::endl;
 
-        
 
     }
     catch(const std::exception& e)
